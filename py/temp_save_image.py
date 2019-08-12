@@ -3,8 +3,6 @@ import os
 import base64
 from PIL import Image
 
-output_table = input_table.copy()
-
 SAVE_PATH = r"C:\Users\Mee\Desktop\AI\Identity Verification\Knime Dump"
 
 for i in range(len(output_table.index)):

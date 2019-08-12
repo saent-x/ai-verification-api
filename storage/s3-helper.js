@@ -36,3 +36,5 @@ const downloadFile = (filePath, bucketName, key) => {
 listDirectories(s3)
   .then(keys => console.log(keys))
   .catch(err => console.log("Unable to fetch keys"));
+
+  

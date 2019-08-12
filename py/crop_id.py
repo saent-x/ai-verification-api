@@ -30,7 +30,6 @@ for i in range(len(output_table.index)):
     image_data = output_table["Id"][i]
 
     # transform the byte array into a buffer and create an image from it 
-    image_buffer = io.BytesIO(base64.decodebytes(image_data))
     image = Image.open(image_buffer)
     image_array = np.array(image)
     gray = cv2.cvtColor(image_array, cv2.COLOR_BGR2GRAY)
