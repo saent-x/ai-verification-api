@@ -24,7 +24,7 @@ def get_blobs_with_prefix(blobs, prefix):
     return results
 
 
-def fetchFiles(prefix, connection_string, container):
+def fetchImages(prefix, connection_string, container):
     blob_service = BlockBlobService(connection_string=connection_string)
 
     prefixed_blobs = get_blobs_with_prefix(
@@ -41,13 +41,17 @@ def fetchFiles(prefix, connection_string, container):
         # Stream the blob and convert it to a bytearray for easy serialization
         blob_service.get_blob_to_stream(
             container, blob.name, blob_stream)
-        buffer = blob_stream.getbuffer()
-
-        if "selfie" in blob.name != -1:
-            selfie = buffer
-        elif "id" in blob.name != -1:
-            ids.append(buffer)
-        print("[INFO]: Added {}".format(blob.name))
+        try:
+            image = Image.open(blob_stream)
+            if "selfie" in blob.name != -1:
+                selfie = image
+            elif "id" in blob.name != -1:
+                ids.append(image)
+            print("[INFO]: Added {}".format(blob.name))
+        except:
+            # Todo: Should probably error here 
+            print("[INFO]: Unable to load {}".format(blob.name))
+       
 
     # Some sanity checks
     if selfie == None:
@@ -65,4 +69,4 @@ def fetchFiles(prefix, connection_string, container):
 # Todo: Remove this
 if __name__ == "__main__":
     CONN_STRING = "DefaultEndpointsProtocol=https;AccountName=mintfintechrgdiag431;AccountKey=j642+deFffJ5aQED0VjLwC54l/hWb7rclvWEidoHjwGg8EsORRNB8fOa8R12iO74FeS1gLs3SwDaMv2lRRPUuw==;EndpointSuffix=core.windows.net"
-    result = fetchFiles("012345", CONN_STRING, "1029380128")
+    result = fetchImages("012345", CONN_STRING, "1029380128")

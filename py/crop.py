@@ -1,8 +1,6 @@
 from cv2 import cv2
-import pandas as pd
 import fnmatch
 import numpy as np
-import PIL
 import base64
 from PIL import Image
 import base64

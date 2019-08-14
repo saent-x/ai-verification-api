@@ -3,25 +3,19 @@ from PIL import Image
 import argparse
 import json
 
-# def identify():
-#     image_buffer = io.BytesIO(base64.decodebytes(image_data))
-#     image = Image.open(image_buffer)
+def identify():
+    args = json.loads(input())
+    prefix, storage_type, credentials = None, None, None
 
-parser = argparse.ArgumentParser()
-parser.add_argument("config")
-args = parser.parse_args()
+    if "prefix" in args == False:
+        raise ValueError("prefix is required")
+    prefix = args["prefix"]
 
-payload = json.loads(args.config)
-prefix, storage_type = "", ""
+    if "storageType" in args == False:
+        raise ValueError("storageType is required")
+    storage_type = args["storageType"]
 
-if "prefix" in payload == False:
-    raise ValueError("prefix is required")
-prefix = payload["prefix"]
+    print("prefix: {}".format(prefix))
+    print("storageType: {}".format(storage_type))
 
-if "storageType" in payload == False:
-    raise ValueError("storageType is required")
-
-storage_type = payload["storageType"]
-
-print("prefix: {}".format(prefix))
-print("storageType: {}".format(storage_type))
+identify()
