@@ -1,18 +1,28 @@
-const { PythonShell } = require("python-shell");
+var input = ["012345", "azure"];
 
-const payload = {
-  prefix: "123456",
-  storageType: "azure"
-};
+require("amqplib/callback_api").connect(
+  "amqp://kelvin:jerryboyis6@localhost",
+  function(err, conn) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    conn.createChannel(function(err, ch) {
+      var simulations = "simulations";
 
-let options = {
-  mode: "text",
-  pythonPath: PythonShell.defaultPythonPath,
-  pythonOptions: ["-u"], // get print results in real-time
-  scriptPath: "py/",
-  mode: "json"
-};
+      ch.assertQueue(simulations, { durable: false });
+      var results = "results";
+      ch.assertQueue(results, { durable: false });
 
-const pyShell = PythonShell.run("identify.py", options);
+      ch.sendToQueue(simulations, Buffer.from(JSON.stringify(input)));
 
-pyShell.send(payload);
+      ch.consume(results, function(msg) {
+        const result = Buffer.from(msg.content).toString("utf-8");
+        console.log(result);
+      });
+    });
+    setTimeout(function() {
+      conn.close();
+    }, 500);
+  }
+);
