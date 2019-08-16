@@ -14,12 +14,11 @@ def isolateFace(image):
     gray = cv2.cvtColor(image_array, cv2.COLOR_BGR2GRAY)
 
     faceCascade = cv2.CascadeClassifier(
-        cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+        "/home/kelvin/haarcascade_frontalface_default.xml")
     faces = faceCascade.detectMultiScale(
         gray,
-        scaleFactor=1.2,
+        scaleFactor=1.3,
         minNeighbors=3,
-        minSize=(100, 100)
     )
 
     # Todo: Clarify if we really need to keep track of the multipe faces??
@@ -33,18 +32,17 @@ def isolateFace(image):
         padding = 0.1
         x_w_new, y_h_new = (x+w+int(w*padding)), (y + h + int(h * padding))
         cv2.rectangle(image_array, (x, y, x+w, y+h), (0, 255, 0), 0)
-        # crop the region with the face
         cropped_image = image.crop((x, y, x_w_new, y_h_new))
 
     return cropped_image
 
 
 def cropFaces(images):
-    # transform the byte array into a buffer and create an image from it
-    images.selfie = isolateFace(images.selfie)
+    images.selfie = isolateFace(images["selfie"])
     cropped_ids = []
 
-    for id_image in images.ids:
+    for id_image in images["ids"]:
         cropped_ids.append(isolateFace(id_image))
 
-    images.ids = cropped_ids
+    images["ids"] = cropped_ids
+    return images
