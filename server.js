@@ -5,7 +5,8 @@ const mongoose = require("mongoose");
 const auth = require("./middleware/auth");
 const bodyParser = require("body-parser");
 const verification = require("./routes/verification");
-const cowsay = require("cowsay");
+const fs = require("fs");
+const path = require("path");
 
 const PORT = process.env.PORT || 9877;
 
@@ -26,13 +27,7 @@ app.use(auth());
 app.use("/verification", verification);
 
 app.get("/", (_, res) =>
-  res.send(
-    cowsay.think({
-      text: "AI IDentity api",
-      e: "oO",
-      T: "U "
-    })
-  )
+  res.type("html").send(fs.readFileSync(path.join(__dirname, "/pages/welcome.html")))
 );
 
 app.listen(PORT);
