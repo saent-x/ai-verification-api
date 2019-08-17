@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const auth = require("./middleware/auth");
 const bodyParser = require("body-parser");
 const verification = require("./routes/verification");
+const cowsay = require("cowsay");
 
 const PORT = process.env.PORT || 9877;
 
@@ -24,10 +25,10 @@ app.use(auth());
 
 app.use("/verification", verification);
 
-app.get("/", (req, res) =>
+app.get("/", (_, res) =>
   res.send(
     cowsay.think({
-      text: "I'm a moooodule",
+      text: "AI IDentity api",
       e: "oO",
       T: "U "
     })
