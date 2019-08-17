@@ -1,5 +1,9 @@
-module.exports = function() {
+
+function Auth() {
   return (req, res, next) => {
-    console.log("Request logged");
+    // check the api-key to make sure it's valid
+    next();
   };
-};
+}
+
+module.exports = Auth
