@@ -3,3 +3,5 @@
 yarn-error.log
 scripts/__pycache__
 test.js
+temp
+azcopy.js

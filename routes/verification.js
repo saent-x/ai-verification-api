@@ -1,7 +1,10 @@
 const express = require("express");
 const uuid = require("uuid/v4");
 const Joi = require("joi");
+const { PythonShell } = require("python-shell");
 const { fetchImagesFromAzure } = require("../azure-helper")
+const path = require("path");
+
 
 const route = express.Router();
 
@@ -9,6 +12,43 @@ const sharedSchema = {
     prefix: Joi.string().required(),
     mode: Joi.string().valid(["identity", "verification"]).required(),
     storageType: Joi.string().valid(["azure", "s3", "headless"]).default("headless")
+}
+
+async function processImages(images) {
+    return new Promise((resolve, reject) => {
+        const arguments = {
+            selfie: images.filter(i => i.indexOf("selfie") != -1)[0],
+            ids: images.filter(i => i.indexOf("id") != -1)
+        };
+
+        const options = {
+            mode: "text",
+            pythonPath: "C:\\Users\\Mee\\Anaconda3\\envs\\py36_knime\\python.exe",
+            pythonOptions: ["-u"],
+            args: [JSON.stringify(arguments)]
+        };
+
+        let result = null;
+
+        const pyshell = new PythonShell(path.join(__dirname, "../scripts/process.py"), options);
+
+        pyshell.on("message", message => {
+            const msg = JSON.parse(message)
+            if (msg.type === "result") {
+                result = msg.result;
+            }
+            else
+                console.log(`[python] -> [${msg.type}] ${msg.message}`);
+        });
+
+        pyshell.on("close", () => {
+            if (result)
+                resolve(result)
+            else
+                reject("Unable to process for some reason")
+        });
+
+    });
 }
 
 async function handleAzureRequest(req, res) {
@@ -30,9 +70,23 @@ async function handleAzureRequest(req, res) {
         return;
     }
 
-    console.log("Fetching images from azure...")
-    const images = await fetchImagesFromAzure(value.storageName, value.accessKey, value.containerName, value.prefix)
-    res.send({ result: images.map(i => i.name) })
+    let images = [];
+    try {
+        console.log("Fetching images from azure...")
+        images = await fetchImagesFromAzure(value.storageName, value.accessKey, value.containerName, value.prefix)
+    }
+    catch (ex) {
+        res.status(500).send({ status: "error", message: "Unable to retrieve images from azure" });
+    }
+    try {
+        console.log("Images fetched, now processing...")
+        const result = await processImages(images);
+        res.send({ status: "success", scores: result })
+    }
+    catch (error) {
+        /* We should never get here */
+        res.status(500).send({ status: "error", message: "Unable to process request" });
+    }
 }
 
 route.post("/", async (req, res) => {

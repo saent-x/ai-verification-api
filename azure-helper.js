@@ -8,6 +8,9 @@ const {
 } = require('@azure/storage-blob');
 const _ = require("lodash");
 const concat = require("concat-stream")
+const os = require("os")
+const path = require("path")
+const fs = require("fs-extra")
 
 const ONE_MINUTE = 60 * 1000;
 
@@ -91,12 +94,15 @@ function fetchImagesFromAzure(storageName, accessKey, containerName, prefix) {
             downloads.push(new Promise((resolve, reject) => {
                 const readStream = downloadResponse.readableStreamBody;
                 readStream.on("error", (e) => {
-                    // console.log(e);
                     reject(Error("Unable to fetch blob data: " + e.message));
                 })
-                writeStream = concat((buffer) => {
-                    console.log(blobName)
-                    resolve({ name: blobName, data: buffer });
+                writeStream = concat(async (buffer) => {
+                    const file = blobName.replace(/\//g, "-")
+                    const outPath = path.join(os.tmpdir(), "azure-cache", file);
+                    await fs.outputFile(outPath, buffer, { encoding: "binary" })
+
+                    console.log(`[azure-helper]: fetched ${file}`);
+                    resolve(outPath);
                 });
                 readStream.pipe(writeStream);
             }));
