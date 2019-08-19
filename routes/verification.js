@@ -23,7 +23,7 @@ async function processImages(images) {
 
         const options = {
             mode: "text",
-            pythonPath: "C:\\Users\\Mee\\Anaconda3\\envs\\py36_knime\\python.exe",
+            pythonPath: process.env.PYTHON_PATH || PythonShell.defaultPythonPath,
             pythonOptions: ["-u"],
             args: [JSON.stringify(arguments)]
         };

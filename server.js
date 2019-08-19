@@ -10,7 +10,7 @@ const path = require("path");
 
 const PORT = process.env.PORT || 9877;
 
-const CONN_STRING = process.env.CONN_STRING
+const CONN_STRING = process.env.CONN_STRING || ""
 
 mongoose
   .connect(CONN_STRING, { useNewUrlParser: true })
