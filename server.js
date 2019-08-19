@@ -8,7 +8,7 @@ const verification = require("./routes/verification");
 const fs = require("fs");
 const path = require("path");
 
-const PORT = process.env.PORT || 9877;
+const PORT = process.env.PORT || 8888;
 
 const CONN_STRING = process.env.CONN_STRING || ""
 
